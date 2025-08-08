@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Chat Agent",
+  "version": "1.0",
+  "description": "A chatbot agent that works on YouTube",
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon1.png"
+    }
+  },
+  "permissions": ["scripting", "activeTab"],
+  "host_permissions": ["https://www.youtube.com/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*"],
+      "js": ["content.js"]
+    }
+  ]
+}

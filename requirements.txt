@@ -1,0 +1,35 @@
+# FastAPI and server
+fastapi
+uvicorn[standard]
+
+# LangChain core and integrations
+langchain
+langchain-community
+
+# Vector stores
+faiss-cpu
+chromadb
+
+# Embedding models
+transformers
+huggingface_hub
+sentence-transformers
+
+# Tokenization
+tiktoken
+
+# YouTube transcription and download
+youtube-transcript-api
+yt-dlp
+
+# Environment variables
+python-dotenv
+
+# File parsing
+pypdf
+python-docx
+unstructured
+
+# Middleware and CORS
+fastapi[all]
+

@@ -12,9 +12,8 @@ CACHE_DIR = "faiss_cache"
 os.makedirs(CACHE_DIR, exist_ok=True)
 
 
-# ----------------------
-# STEP 1: Transcript Load WITH TIMESTAMPS
-# ----------------------
+
+# Transcript Load WITH TIMESTAMPS
 def get_video_transcript(video_id: str):
     """
     Returns transcript chunks with text, start time, and duration.
@@ -27,9 +26,8 @@ def get_video_transcript(video_id: str):
         return []
 
 
-# ----------------------
-# STEP 2: Manual Chunking with Start Time Preservation
-# ----------------------
+
+# Manual Chunking with Start Time Preservation
 def split_text_with_metadata(transcript_list):
     """
     Groups transcript lines into chunks while keeping the start time
@@ -58,7 +56,7 @@ def split_text_with_metadata(transcript_list):
                 metadata={"start": current_start}
             ))
 
-            # Overlap logic
+            
             overlap_text = " ".join(current_text)[-chunk_overlap:]
             current_text = [overlap_text, text]
             current_start = start
@@ -73,9 +71,8 @@ def split_text_with_metadata(transcript_list):
     return docs
 
 
-# ----------------------
-# STEP 3: Embedding + FAISS Caching
-# ----------------------
+
+# Embedding + FAISS Caching
 def get_vector_store(video_id: str, chunks):
     index_path = os.path.join(CACHE_DIR, f"{video_id}_faiss")
     embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
@@ -90,16 +87,14 @@ def get_vector_store(video_id: str, chunks):
     return vector_store
 
 
-# ----------------------
-# STEP 4: Retriever
-# ----------------------
+
+# Retriever
 def get_retriever(vector_store):
     return vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 3})
 
 
-# ----------------------
-# STEP 5: Prompt Template
-# ----------------------
+
+# Prompt Template
 prompt = ChatPromptTemplate.from_messages([
     ("system", """You are a helpful assistant.
 ONLY use the following transcript context to answer.
@@ -111,9 +106,8 @@ Transcript context:
 ])
 
 
-# ----------------------
-# STEP 6: Local Ollama Call (streaming)
-# ----------------------
+
+# Local Ollama Call (streaming)
 def call_local_ollama(prompt_text: str) -> str:
     full_response = []
     for chunk in ollama.chat(
@@ -130,9 +124,8 @@ def call_local_ollama(prompt_text: str) -> str:
     return "".join(full_response)
 
 
-# ----------------------
-# STEP 7: Build RAG Chain with Multiple Timestamps
-# ----------------------
+
+# RAG Chain with Multiple Timestamps
 def build_rag_chain(retriever):
     def rag_pipeline(input_dict):
         retrieved_docs = retriever.invoke(input_dict["question"])
@@ -166,9 +159,8 @@ def build_rag_chain(retriever):
     return rag_pipeline
 
 
-# ----------------------
-# ✅ Main RAG Pipeline Wrapper
-# ----------------------
+
+# Main RAG Pipeline Wrapper
 def run_rag_pipeline(video_id: str, user_question: str, chat_history: list):
     transcript_list = get_video_transcript(video_id)
     if not transcript_list:
@@ -185,9 +177,8 @@ def run_rag_pipeline(video_id: str, user_question: str, chat_history: list):
     })
 
 
-# ----------------------
+
 # Test
-# ----------------------
 # if __name__ == "__main__":
 #     video_id = "Gfr50f6ZBvo"
 #     result = run_rag_pipeline(video_id, "who is discussed about DeepMind?", [])

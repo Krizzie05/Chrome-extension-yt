@@ -3,27 +3,27 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
 import traceback
-from app.rag.pipeline import run_rag_pipeline  # Import your updated RAG function
+from app.rag.pipeline import run_rag_pipeline  
 
-# ---------- FastAPI Setup ----------
+# FastAPI Setup
 app = FastAPI(title="YouTube RAG API", version="1.0")
 
 # Allow Chrome extension calls
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # change to ["chrome-extension://<your-extension-id>"] for production
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ---------- Request Model ----------
+# Request Model
 class RAGRequest(BaseModel):
     video_id: str
     question: str
     chat_history: list = []
 
-# ---------- Routes ----------
+# Routes
 @app.post("/rag/query")
 async def rag_query(req: RAGRequest):
     """
@@ -37,7 +37,6 @@ async def rag_query(req: RAGRequest):
             chat_history=req.chat_history
         )
 
-        # Ensure structure
         return {
             "answer": result.get("answer", "No answer generated."),
             "timestamps": result.get("timestamps", [])
@@ -51,6 +50,6 @@ async def rag_query(req: RAGRequest):
 async def root():
     return {"message": "YouTube RAG API is running"}
 
-# ---------- Start Server ----------
+# Start Server
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
